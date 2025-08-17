@@ -1,0 +1,50 @@
+name: Build Windows MSI
+
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - 'MiniFileBot/**'
+      - 'installer/**'
+
+jobs:
+  build-windows-msi:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r MiniFileBot/requirements.txt pyinstaller
+
+      - name: Build EXE
+        working-directory: MiniFileBot
+        run: |
+          pyinstaller --noconfirm --clean --windowed --onefile app_gui.py ^
+            --name MiniFileBot ^
+            --collect-all PySide6 ^
+            --collect-submodules guessit
+          copy config.yaml dist\config.yaml
+
+      - name: Install WiX Toolset
+        run: choco install wixtoolset --yes
+
+      - name: Build MSI with WiX
+        working-directory: installer
+        run: |
+          set BUILDOUT=%CD%\..\MiniFileBot\dist
+          candle.exe -dBuildOutput="%BUILDOUT%" MiniFileBot.wxs
+          for %%f in (*.wixobj) do set WIXOBJ=%%f
+          light.exe "%WIXOBJ%" -ext WixUIExtension -o ..\dist\MiniFileBot-Installer.msi
+
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiniFileBot-MSI
+          path: dist/
