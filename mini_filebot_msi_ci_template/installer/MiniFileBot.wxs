@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="MiniFileBot" Language="1033" Version="1.0.0" Manufacturer="MiniFileBot" UpgradeCode="A1B2C3D4-E5F6-4A7B-8C9D-0123456789AB">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <MajorUpgrade AllowDowngrades="no" DowngradeErrorMessage="A newer version of MiniFileBot is already installed." />
+    <Feature Id="MainFeature" Title="MiniFileBot" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <UIRef Id="WixUI_InstallDir" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MiniFileBot" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder" />
+    </Directory>
+
+    <DirectoryRef Id="ProgramMenuFolder">
+      <Component Id="ApplicationShortcut" Guid="*">
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="MiniFileBot" Target="[INSTALLFOLDER]MiniFileBot.exe" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveShortcutFolder" Directory="ProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\MiniFileBot" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Component Id="ExeComponent" Guid="*">
+        <File Id="MiniFileBotExe" Source="$(var.BuildOutput)\MiniFileBot.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="ConfigComponent" Guid="*">
+        <File Id="ConfigYaml" Source="$(var.BuildOutput)\config.yaml" />
+      </Component>
+    </ComponentGroup>
+  </Product>
+</Wix>

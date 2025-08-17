@@ -1,0 +1,6 @@
+PySide6
+requests
+PyYAML
+guessit
+tqdm
+python-dateutil

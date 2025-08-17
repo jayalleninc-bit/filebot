@@ -1,0 +1,25 @@
+paths:
+  movie_dir: ./Movies
+  tv_dir: ./TV
+
+providers:
+  preference: "Auto"
+  tmdb:
+    api_key: ""
+    language: "en-US"
+  tvdb:
+    api_key: ""
+    pin: ""
+  anilist:
+    enabled: true
+
+behavior:
+  action: move
+  dry_run: true
+  skip_samples: true
+  max_depth: 5
+
+patterns:
+  movie: "{title} ({year})/{title} ({year})"
+  episode: "{series}/Season {season:02}/{series} - S{season:02}E{episode:02} - {title}"
+  anime_absolute: "{series}/{series} - {absolute:03}"
